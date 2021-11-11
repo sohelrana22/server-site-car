@@ -42,6 +42,14 @@ async function run (){
         res.json(order);
     })
 
+    app.post('/caritem', async (req, res)=>{
+        const car = req.body;
+        console.log('hit the post api', car)
+        const result = await carCollection.insertOne(car);
+        console.log(result);
+        res.json(result)
+    });
+
        // POST API
        app.post('/order', async (req, res) => {
            const order =req.body;
