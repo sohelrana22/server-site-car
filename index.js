@@ -19,9 +19,16 @@ async function run (){
        const database = client.db('car_house');
        const carCollection = database.collection('caritem');
        const orderCollection = database.collection('order');
+       const reviewCollection = database.collection('review');
+       const usersCollection = database.collection('users');
 
-       // GET Travels API
+       // GET car API
        app.get('/caritem', async (req, res) => {
+           const cursor = carCollection.find({});
+           const caritem = await cursor.toArray();
+           res.send(caritem);
+       })
+       app.get('/review', async (req, res) => {
            const cursor = carCollection.find({});
            const caritem = await cursor.toArray();
            res.send(caritem);
@@ -49,16 +56,62 @@ async function run (){
         console.log(result);
         res.json(result)
     });
+    app.post('/review', async (req, res)=>{
+        const review = req.body;
+        console.log('hit the post api', review)
+        const result = await reviewCollection.insertOne(review);
+        console.log(result);
+        res.json(result)
+    });
 
        // POST API
        app.post('/order', async (req, res) => {
            const order =req.body;
            console.log('hit the post api', order);
-
            const result =await orderCollection.insertOne(order);
            console.log(result);
            res.send(result)
        });
+
+       // User API
+       app.post('/users', async (req, res) => {
+           const user =req.body;
+           const result =await usersCollection.insertOne(user);
+           console.log(result);
+           res.send(result)
+       });
+
+       app.get('/users/:email', async (req, res) => {
+           const email = req.params.email;
+           const query = {email: email};
+           const user = await usersCollection.findOne(query);
+           let isAdmin = false;
+           if (user?.role === 'admin') {
+               isAdmin = true;
+           }
+           res.json({admin: isAdmin});
+       })
+
+       // Google User API
+       app.put('/users', async (req, res) => {
+        const user =req.body;
+        const filter = {email: user.email};
+        const options = {upsert: ture};
+        const updateDoc = {$set: user};
+        const result =await usersCollection.updateOne(filter, updateDoc, options);
+        res.json(result);
+       });
+
+
+       // Admin role update
+       app.put('/users/admin', async (req, res) => {
+        const user =req.body;
+        const filter = {email: user.email};
+        const updateDoc = {$set: {role: 'admin'}};
+        const result =await usersCollection.updateOne(filter, updateDoc);
+        res.json(result);
+       });
+        
 
         // GET API 
         app.get('/order', async (req, res) => {
