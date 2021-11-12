@@ -135,6 +135,13 @@ async function run (){
             res.json(result);
         });
 
+        app.delete('/caritem/:name', async(req, res) => {
+            const name = req.params.name;
+            const query = {name};
+            const result = await carCollection.deleteOne(query);
+            res.json(result);
+        });
+
         // All Order API
         app.get('/manageorder', async (req, res) =>{
             const cursor = orderCollection.find({});
