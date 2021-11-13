@@ -29,7 +29,7 @@ async function run (){
            res.send(caritem);
        })
        app.get('/review', async (req, res) => {
-           const cursor = carCollection.find({});
+           const cursor = reviewCollection.find({});
            const caritem = await cursor.toArray();
            res.send(caritem);
        })
